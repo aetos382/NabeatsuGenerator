@@ -1,4 +1,3 @@
-﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.2.32630.192
@@ -9,7 +8,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NabeatsuConsole", "Nabeatsu
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NabeatsuGenerator.SourceGenerator", "NabeatsuGenerator.SourceGenerator\NabeatsuGenerator.SourceGenerator.csproj", "{99F1EC03-5B4D-4DD8-B9D9-F7675D092908}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HiraganaFormatter", "HiraganaFormatter\HiraganaFormatter.csproj", "{8FC54201-272A-4782-8AAB-4AC1BDE81F60}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JapaneseFormatter", "JapaneseFormatter\JapaneseFormatter.csproj", "{8FC54201-272A-4782-8AAB-4AC1BDE81F60}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
