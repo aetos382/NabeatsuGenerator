@@ -229,6 +229,30 @@ public class Generator :
             sourceTypeNode = sourceTypeNode.Parent as TypeDeclarationSyntax;
         }
 
+        resultNode = ((TypeDeclarationSyntax)resultNode)
+            .WithAttributeLists(
+                SyntaxFactory.List(
+                    new[] {
+                        SyntaxFactory.AttributeList(
+                            SyntaxFactory.SeparatedList(
+                                new[] {
+                                    SyntaxFactory.Attribute(
+                                        SyntaxFactory.ParseName("System.CodeDom.Compiler.GeneratedCode"),
+                                        SyntaxFactory.AttributeArgumentList(
+                                            SyntaxFactory.SeparatedList(
+                                                new[] {
+                                                    SyntaxFactory.AttributeArgument(
+                                                        SyntaxFactory.LiteralExpression(
+                                                            SyntaxKind.StringLiteralExpression,
+                                                            SyntaxFactory.Literal("NabeatsuGenerator"))),
+                                                    SyntaxFactory.AttributeArgument(
+                                                        SyntaxFactory.LiteralExpression(
+                                                            SyntaxKind.StringLiteralExpression,
+                                                            SyntaxFactory.Literal("0.1.0")))
+                                                })))
+                                }))
+                    }));
+
         var nsNames = new Stack<string>();
 
         var sourceNsNode = (BaseNamespaceDeclarationSyntax?)topSourceTypeNode.Parent;
