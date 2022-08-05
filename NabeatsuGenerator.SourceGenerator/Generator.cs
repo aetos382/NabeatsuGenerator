@@ -202,31 +202,30 @@ public class Generator :
             .WithBody(SyntaxFactory.Block(yieldStatements));
 
         var sourceTypeNode = (TypeDeclarationSyntax)sourceMethodNode.Parent!;
+        var topSourceTypeNode = sourceTypeNode;
 
-        SyntaxNode resultNode = SyntaxFactory
+        TypeDeclarationSyntax topResultTypeNode = SyntaxFactory
             .ClassDeclaration(sourceTypeNode.Identifier)
             .WithModifiers(sourceTypeNode.Modifiers)
             .WithMembers(
                 SyntaxFactory.List(
                     new MemberDeclarationSyntax[] { method }));
 
-        var topSourceTypeNode = sourceTypeNode;
-
         sourceTypeNode = sourceTypeNode.Parent as TypeDeclarationSyntax;
         while (sourceTypeNode is not null)
         {
             context.CancellationToken.ThrowIfCancellationRequested();
 
-            var parentTypeDecl = SyntaxFactory
+            var parentTypeNode = SyntaxFactory
                 .TypeDeclaration(sourceTypeNode.Kind(), sourceTypeNode.Identifier)
                 .WithModifiers(sourceTypeNode.Modifiers)
                 .WithMembers(
                     SyntaxFactory.List(
-                        new MemberDeclarationSyntax[] { (TypeDeclarationSyntax)resultNode }));
+                        new MemberDeclarationSyntax[] { topResultTypeNode }));
 
-            resultNode = parentTypeDecl;
-
+            topResultTypeNode = parentTypeNode;
             topSourceTypeNode = sourceTypeNode;
+
             sourceTypeNode = sourceTypeNode.Parent as TypeDeclarationSyntax;
         }
 
@@ -234,7 +233,7 @@ public class Generator :
         var att = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>();
         var version = att.InformationalVersion;
 
-        resultNode = ((TypeDeclarationSyntax)resultNode)
+        topResultTypeNode = topResultTypeNode
             .WithAttributeLists(
                 SyntaxFactory.List(
                     new[] {
@@ -258,6 +257,8 @@ public class Generator :
                                 }))
                     }));
 
+        SyntaxNode resultNode = topResultTypeNode;
+
         var nsNames = new Stack<string>();
 
         var sourceNsNode = (BaseNamespaceDeclarationSyntax?)topSourceTypeNode.Parent;
@@ -277,7 +278,7 @@ public class Generator :
                 .NamespaceDeclaration(nsName)
                 .WithMembers(
                     SyntaxFactory.List(
-                        new MemberDeclarationSyntax[] { (TypeDeclarationSyntax)resultNode }));
+                        new MemberDeclarationSyntax[] { topResultTypeNode }));
 
             resultNode = resultNsNode;
         }
