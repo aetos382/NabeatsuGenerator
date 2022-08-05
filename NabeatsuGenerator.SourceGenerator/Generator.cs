@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+using System.CodeDom.Compiler;
+using System.Globalization;
 using System.Reflection;
 
 using Microsoft.CodeAnalysis;
@@ -234,28 +235,13 @@ public class Generator :
         var version = att.InformationalVersion;
 
         topResultTypeNode = topResultTypeNode
-            .WithAttributeLists(
-                SyntaxFactory.List(
-                    new[] {
-                        SyntaxFactory.AttributeList(
-                            SyntaxFactory.SeparatedList(
-                                new[] {
-                                    SyntaxFactory.Attribute(
-                                        SyntaxFactory.ParseName("System.CodeDom.Compiler.GeneratedCode"),
-                                        SyntaxFactory.AttributeArgumentList(
-                                            SyntaxFactory.SeparatedList(
-                                                new[] {
-                                                    SyntaxFactory.AttributeArgument(
-                                                        SyntaxFactory.LiteralExpression(
-                                                            SyntaxKind.StringLiteralExpression,
-                                                            SyntaxFactory.Literal(typeof(Generator).FullName))),
-                                                    SyntaxFactory.AttributeArgument(
-                                                        SyntaxFactory.LiteralExpression(
-                                                            SyntaxKind.StringLiteralExpression,
-                                                            SyntaxFactory.Literal(version)))
-                                                })))
-                                }))
-                    }));
+            .WithAttribute(
+                typeof(GeneratedCodeAttribute),
+                new (string?, object?) [] {
+                    (null, typeof(Generator).FullName),
+                    (null, version)
+                },
+                cancellationToken: context.CancellationToken);
 
         SyntaxNode resultNode = topResultTypeNode;
 
