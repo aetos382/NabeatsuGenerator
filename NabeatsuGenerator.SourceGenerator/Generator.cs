@@ -197,8 +197,14 @@ public class Generator :
 
         var sourceMethodNode = info.MethodNode;
 
+        var returnTypeName = info.MethodSymbol.ReturnType.ToDisplayString(
+            new SymbolDisplayFormat(
+                globalNamespaceStyle: SymbolDisplayGlobalNamespaceStyle.Included,
+                typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces,
+                SymbolDisplayGenericsOptions.IncludeTypeParameters));
+
         var method = SyntaxFactory
-            .MethodDeclaration(sourceMethodNode.ReturnType, sourceMethodNode.Identifier)
+            .MethodDeclaration(SyntaxFactory.ParseName(returnTypeName), sourceMethodNode.Identifier)
             .WithModifiers(sourceMethodNode.Modifiers)
             .WithBody(SyntaxFactory.Block(yieldStatements));
 
