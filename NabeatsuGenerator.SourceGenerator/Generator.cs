@@ -1,4 +1,4 @@
-using System.CodeDom.Compiler;
+﻿using System.CodeDom.Compiler;
 using System.Globalization;
 using System.Reflection;
 
@@ -52,10 +52,10 @@ public class Generator :
 
                 var generationInfo = TryGetGenerationInfo(
                     context,
-                    source.MethodNode,
-                    source.MethodSymbol,
-                    source.NabeatuAttributeSymbol,
-                    source.IEnumerableOfStringSymbol);
+                    source.MethodNode!,
+                    source.MethodSymbol!,
+                    source.NabeatuAttributeSymbol!,
+                    source.IEnumerableOfStringSymbol!);
 
                 if (generationInfo is null)
                 {
