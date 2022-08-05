@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using System.Reflection;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -229,6 +230,10 @@ public class Generator :
             sourceTypeNode = sourceTypeNode.Parent as TypeDeclarationSyntax;
         }
 
+        var assembly = Assembly.GetExecutingAssembly();
+        var att = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>();
+        var version = att.InformationalVersion;
+
         resultNode = ((TypeDeclarationSyntax)resultNode)
             .WithAttributeLists(
                 SyntaxFactory.List(
@@ -244,11 +249,11 @@ public class Generator :
                                                     SyntaxFactory.AttributeArgument(
                                                         SyntaxFactory.LiteralExpression(
                                                             SyntaxKind.StringLiteralExpression,
-                                                            SyntaxFactory.Literal("NabeatsuGenerator"))),
+                                                            SyntaxFactory.Literal(typeof(Generator).FullName))),
                                                     SyntaxFactory.AttributeArgument(
                                                         SyntaxFactory.LiteralExpression(
                                                             SyntaxKind.StringLiteralExpression,
-                                                            SyntaxFactory.Literal("0.1.0")))
+                                                            SyntaxFactory.Literal(version)))
                                                 })))
                                 }))
                     }));

@@ -12,7 +12,7 @@
     <ProjectReference Include="..\NabeatsuGenerator\NabeatsuGenerator.csproj" />
     <ProjectReference Include="..\NabeatsuGenerator.SourceGenerator\NabeatsuGenerator.SourceGenerator.csproj">
       <OutputItemType>Analyzer</OutputItemType>
-      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
   </ItemGroup>
 

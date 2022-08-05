@@ -80,7 +80,7 @@
       "nabeatsugenerator.sourcegenerator": {
         "type": "Project",
         "dependencies": {
-          "JapaneseFormatter": "1.0.0",
+          "JapaneseFormatter": "0.1.0",
           "Microsoft.Bcl.HashCode": "1.1.1"
         }
       },
