@@ -68,7 +68,7 @@ public class Generator :
                     typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces,
                     parameterOptions: SymbolDisplayParameterOptions.IncludeType);
 
-                var typeName = source!.MethodSymbol.ContainingType!.ToDisplayString(format);
+                var typeName = source.MethodSymbol!.ContainingType!.ToDisplayString(format);
                 var methodName = source.MethodSymbol.ToDisplayString(format);
 
                 context.AddSource($"{typeName}.{methodName}.cs", code);
@@ -81,8 +81,7 @@ public class Generator :
         CancellationToken cancellationToken)
     {
         return
-            node is MethodDeclarationSyntax mds &&
-            mds.AttributeLists.Count > 0;
+            node is MethodDeclarationSyntax { AttributeLists.Count: > 0 };
     }
 
     static (MethodDeclarationSyntax Node, IMethodSymbol Symbol) TransformSyntaxNode(
@@ -99,14 +98,14 @@ public class Generator :
         SourceProductionContext context,
         MethodDeclarationSyntax methodSyntax,
         IMethodSymbol methodSymbol,
-        INamedTypeSymbol nabeatsuAttributeSymnbol,
+        INamedTypeSymbol nabeatsuAttributeSymbol,
         INamedTypeSymbol enumerableOfStringSymbol)
     {
         var attrs = methodSymbol.GetAttributes();
 
         var nAttr = attrs
             .SingleOrDefault(
-                a => SymbolEqualityComparer.Default.Equals(a.AttributeClass, nabeatsuAttributeSymnbol));
+                a => SymbolEqualityComparer.Default.Equals(a.AttributeClass, nabeatsuAttributeSymbol));
 
         if (nAttr is null)
         {
