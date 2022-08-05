@@ -5,13 +5,14 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\NabeatsuGenerator\NabeatsuGenerator.csproj" />
     <ProjectReference Include="..\NabeatsuGenerator.SourceGenerator\NabeatsuGenerator.SourceGenerator.csproj">
-      <PrivateAssets>all</PrivateAssets>
       <OutputItemType>Analyzer</OutputItemType>
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
     </ProjectReference>
   </ItemGroup>
 

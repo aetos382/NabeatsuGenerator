@@ -64,7 +64,10 @@
         "type": "Project"
       },
       "nabeatsugenerator": {
-        "type": "Project"
+        "type": "Project",
+        "dependencies": {
+          "NabeatsuGenerator.SourceGenerator": "1.0.0"
+        }
       },
       "nabeatsugenerator.sourcegenerator": {
         "type": "Project",

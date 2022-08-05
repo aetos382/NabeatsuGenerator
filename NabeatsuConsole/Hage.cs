@@ -2,7 +2,7 @@
 
 namespace Foo
 {
-    namespace Bar.Bar.Bar
+    namespace Bar1.Bar2.Bar3
     {
         namespace Baz
         {

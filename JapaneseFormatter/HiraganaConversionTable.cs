@@ -57,9 +57,10 @@ internal class HiraganaConversionTable :
         int manUnit)
     {
         return (digit, juUnit, manUnit) switch {
-            (0, 1, 1) => _manUnits[manUnit],
+            (_, not 0, _) => string.Empty,
+            (_, 0, not 0) => _manUnits[manUnit],
             (0, _, _) => string.Empty,
-            _ => _manUnits[manUnit]
+            (_, _, 0) => string.Empty
         };
     }
 
