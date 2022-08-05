@@ -16,7 +16,7 @@ internal static class Diagnostics
     }
 
     private static readonly DiagnosticDescriptor _aho001 =
-        new DiagnosticDescriptor(
+        new(
             "AHO001",
             CreateResourceString(nameof(Resources.AHO001Title)),
             CreateResourceString(nameof(Resources.AHO001Format)),
@@ -25,7 +25,7 @@ internal static class Diagnostics
             true);
 
     private static readonly DiagnosticDescriptor _aho002 =
-        new DiagnosticDescriptor(
+        new(
             "AHO002",
             CreateResourceString(nameof(Resources.AHO002Title)),
             CreateResourceString(nameof(Resources.AHO002Format)),
@@ -34,7 +34,7 @@ internal static class Diagnostics
             true);
 
     private static readonly DiagnosticDescriptor _aho003 =
-        new DiagnosticDescriptor(
+        new(
             "AHO003",
             CreateResourceString(nameof(Resources.AHO003Title)),
             CreateResourceString(nameof(Resources.AHO003Format)),
@@ -43,7 +43,7 @@ internal static class Diagnostics
             true);
 
     private static readonly DiagnosticDescriptor _aho004 =
-        new DiagnosticDescriptor(
+        new(
             "AHO004",
             CreateResourceString(nameof(Resources.AHO004Title)),
             CreateResourceString(nameof(Resources.AHO004Format)),

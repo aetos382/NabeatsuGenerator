@@ -73,8 +73,12 @@
         "type": "Project",
         "dependencies": {
           "JapaneseFormatter": "0.1.0",
-          "Microsoft.Bcl.HashCode": "1.1.1"
+          "Microsoft.Bcl.HashCode": "1.1.1",
+          "RoslynHelper": "0.1.0"
         }
+      },
+      "roslynhelper": {
+        "type": "Project"
       },
       "Microsoft.Bcl.HashCode": {
         "type": "CentralTransitive",

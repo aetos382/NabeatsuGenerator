@@ -2,9 +2,9 @@
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace NabeatsuGenerator.SourceGenerator;
+namespace RoslynHelper;
 
-internal static class SyntaxNodeExtensions
+public static partial class SyntaxNodeExtensions
 {
     public static TypeDeclarationSyntax WithAttribute(
         this TypeDeclarationSyntax syntax,
@@ -90,15 +90,15 @@ internal static class SyntaxNodeExtensions
 
         if (constructorArguments is not null)
         {
-            foreach (var constructorArgument in constructorArguments)
+            foreach (var (name, value) in constructorArguments)
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                var expression = ValueToExpression(constructorArgument.Value);
+                var expression = ValueToExpression(value);
 
-                var nameSyntax = constructorArgument.ParameterName switch {
+                var nameSyntax = name switch {
                     null => default,
-                    var name => SyntaxFactory.NameColon(name)
+                    _ => SyntaxFactory.NameColon(name)
                 };
 
                 var argument = SyntaxFactory.AttributeArgument(
@@ -110,15 +110,15 @@ internal static class SyntaxNodeExtensions
 
         if (namedArguments is not null)
         {
-            foreach (var namedArgument in namedArguments)
+            foreach (var (name, value) in namedArguments)
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                var expression = ValueToExpression(namedArgument.Value);
+                var expression = ValueToExpression(value);
 
-                var nameSyntax = namedArgument.MemberName switch {
+                var nameSyntax = name switch {
                     null => default,
-                    var name => SyntaxFactory.NameEquals(name)
+                    _ => SyntaxFactory.NameEquals(name)
                 };
 
                 var argument = SyntaxFactory.AttributeArgument(
@@ -134,7 +134,7 @@ internal static class SyntaxNodeExtensions
                     SyntaxFactory.SeparatedList(
                         new[] {
                             SyntaxFactory.Attribute(
-                                SyntaxFactory.ParseName(attributeTypeName),
+                                SyntaxFactory.ParseName(attributeTypeName).WithGlobalPrefix(),
                                 SyntaxFactory.AttributeArgumentList(
                                     SyntaxFactory.SeparatedList(
                                         attributeArguments)))
@@ -151,8 +151,8 @@ internal static class SyntaxNodeExtensions
 
         if (value is Type t)
         {
-            expression = SyntaxFactory.TypeOfExpression(
-                SyntaxFactory.ParseTypeName(t.FullName));
+            var typeName = SyntaxFactory.ParseTypeName(t.FullName!) as NameSyntax;
+            expression = SyntaxFactory.TypeOfExpression(typeName!.WithGlobalPrefix());
         }
         else if (value is Enum e)
         {
@@ -160,8 +160,8 @@ internal static class SyntaxNodeExtensions
 
             expression = SyntaxFactory.MemberAccessExpression(
                 SyntaxKind.SimpleMemberAccessExpression,
-                SyntaxFactory.IdentifierName(enumType.FullName),
-                SyntaxFactory.IdentifierName(Enum.GetName(enumType, e)));
+                SyntaxFactory.ParseName(enumType.FullName!).WithGlobalPrefix(),
+                SyntaxFactory.IdentifierName(Enum.GetName(enumType, e)!));
         }
         else
         {

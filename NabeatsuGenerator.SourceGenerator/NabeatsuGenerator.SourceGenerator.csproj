@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
@@ -26,6 +26,10 @@
       <OutputItemType>Analyzer</OutputItemType>
       <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
     </ProjectReference>
+    <ProjectReference Include="..\RoslynHelper\RoslynHelper.csproj">
+      <OutputItemType>Analyzer</OutputItemType>
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+    </ProjectReference>
   </ItemGroup>
 
   <ItemGroup>
@@ -50,8 +54,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <AdditionalFiles Include="AnalyzerReleases.Shipped.md"/>
-    <AdditionalFiles Include="AnalyzerReleases.Unshipped.md"/>
+    <AdditionalFiles Include="AnalyzerReleases.Shipped.md" />
+    <AdditionalFiles Include="AnalyzerReleases.Unshipped.md" />
   </ItemGroup>
 
   <PropertyGroup>
@@ -63,17 +67,12 @@
 
   <Target Name="_PrepareForPack">
     <ItemGroup>
-      <None Include="$(TargetPath)">
+      <None Include="$(OutDir)\*.dll">
         <Pack>true</Pack>
         <PackagePath>analyzers/dotnet/cs</PackagePath>
         <Visible>false</Visible>
       </None>
       <None Include="$(PkgMicrosoft_Bcl_HashCode)\lib\netstandard2.0\*.dll">
-        <Pack>true</Pack>
-        <PackagePath>analyzers/dotnet/cs</PackagePath>
-        <Visible>false</Visible>
-      </None>
-      <None Include="$(OutDir)\JapaneseFormatter.dll">
         <Pack>true</Pack>
         <PackagePath>analyzers/dotnet/cs</PackagePath>
         <Visible>false</Visible>

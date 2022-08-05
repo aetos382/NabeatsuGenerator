@@ -7,6 +7,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 using JapaneseFormatter;
+using RoslynHelper;
 
 namespace NabeatsuGenerator.SourceGenerator;
 
