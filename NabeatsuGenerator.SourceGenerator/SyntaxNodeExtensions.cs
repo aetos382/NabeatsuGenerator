@@ -122,9 +122,7 @@ internal static class SyntaxNodeExtensions
                 };
 
                 var argument = SyntaxFactory.AttributeArgument(
-                    nameSyntax,
-                    default,
-                    expression);
+                    nameSyntax, default, expression);
 
                 attributeArguments.Add(argument);
             }
