@@ -12,7 +12,7 @@ namespace Foo
                 {
                     public partial class Hage
                     {
-                        [N(2110000200, 2110000204)]
+                        [N(1, 100)]
                         public static partial IEnumerable<string> GenerateNabeatsuSequence();
                     }
                 }
