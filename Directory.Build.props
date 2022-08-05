@@ -6,8 +6,10 @@
   </ItemGroup>
 
   <PropertyGroup>
+    <Version>0.1.0</Version>
     <DefaultItemExcludes>$(DefaultItemExcludes);*.log;*.binlog</DefaultItemExcludes>
   </PropertyGroup>
+
   <PropertyGroup Condition="'$(IsPackable)' == 'true'">
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
   </PropertyGroup>

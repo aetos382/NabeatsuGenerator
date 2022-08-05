@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Globalization;
+﻿using System.Globalization;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -20,7 +19,8 @@ public class Generator :
 
         var nabeatsuAttributeProvider = context.CompilationProvider
             .Select((compilation, _) => {
-                return compilation.GetTypeByMetadataName("NabeatsuGenerator.NabeatsuAttribute")!;
+                var attributeSymbol = compilation.GetTypeByMetadataName("NabeatsuGenerator.NabeatsuAttribute")!;
+                return attributeSymbol;
             })
             .WithComparer(SymbolEqualityComparer.Default);
 
@@ -38,21 +38,29 @@ public class Generator :
             .WithComparer(MethodNodeAndSymbolComparer.Instance)
             .Combine(nabeatsuAttributeProvider)
             .Combine(enumerableOfStringProvider)
-            .Select(static (tuple, _) => TryGetGenerationInfo(
-                tuple.Left.Left.Node,
-                tuple.Left.Left.Symbol,
-                tuple.Left.Right,
-                tuple.Right))
-            .Where(static info => info is not null)
-            .WithComparer(GenerationInfoComparer.Instance);
+            .Select((tuple, _) => (
+                MethodNode: tuple.Left.Left.Node,
+                MethodSymbol: tuple.Left.Left.Symbol,
+                NabeatuAttributeSymbol: tuple.Left.Right,
+                IEnumerableOfStringSymbol: tuple.Right));
 
         context.RegisterImplementationSourceOutput(
             generationInfoProvider,
             static (context, source) => {
 
-                Debug.Assert(source is not null);
+                var generationInfo = TryGetGenerationInfo(
+                    context,
+                    source.MethodNode,
+                    source.MethodSymbol,
+                    source.NabeatuAttributeSymbol,
+                    source.IEnumerableOfStringSymbol);
 
-                var generatedSyntax = GenerateSyntax(source);
+                if (generationInfo is null)
+                {
+                    return;
+                }
+
+                var generatedSyntax = GenerateSyntax(generationInfo, context);
 
                 var code = generatedSyntax.NormalizeWhitespace().ToFullString();
 
@@ -60,7 +68,7 @@ public class Generator :
                     typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces,
                     parameterOptions: SymbolDisplayParameterOptions.IncludeType);
 
-                var typeName = source.MethodSymbol.ContainingType.ToDisplayString(format);
+                var typeName = source!.MethodSymbol.ContainingType!.ToDisplayString(format);
                 var methodName = source.MethodSymbol.ToDisplayString(format);
 
                 context.AddSource($"{typeName}.{methodName}.cs", code);
@@ -74,8 +82,7 @@ public class Generator :
     {
         return
             node is MethodDeclarationSyntax mds &&
-            mds.AttributeLists.Count > 0 &&
-            mds.Modifiers.Any(SyntaxKind.PartialKeyword);
+            mds.AttributeLists.Count > 0;
     }
 
     static (MethodDeclarationSyntax Node, IMethodSymbol Symbol) TransformSyntaxNode(
@@ -89,7 +96,8 @@ public class Generator :
     }
 
     static GenerationInfo? TryGetGenerationInfo(
-        MethodDeclarationSyntax syntaxNode,
+        SourceProductionContext context,
+        MethodDeclarationSyntax methodSyntax,
         IMethodSymbol methodSymbol,
         INamedTypeSymbol nabeatsuAttributeSymnbol,
         INamedTypeSymbol enumerableOfStringSymbol)
@@ -105,37 +113,75 @@ public class Generator :
             return null;
         }
 
+        var methodLocation = methodSyntax.GetLocation();
+
+        if (!methodSyntax.Modifiers.Any(SyntaxKind.PartialKeyword))
+        {
+            context.ReportDiagnostic(
+                Diagnostics.MethodMustBePartial(methodLocation));
+
+            return null;
+        }
+
+        var attributeLocation = Location.Create(
+            nAttr.ApplicationSyntaxReference.SyntaxTree,
+            nAttr.ApplicationSyntaxReference.Span);
+
         var ctorArgs = nAttr.ConstructorArguments;
 
-        // TODO: warning
+        var start = (int)ctorArgs[0].Value!;
+        var end = (int)ctorArgs[1].Value!;
+
+        if (start < 0)
+        {
+            context.ReportDiagnostic(
+                Diagnostics.StartParameterValueMustBeGreaterThanOrEqualToZero(
+                    attributeLocation,
+                    start));
+
+            return null;
+        }
+
+        if (end < start)
+        {
+            context.ReportDiagnostic(
+                Diagnostics.EndParameterValueMustBeGreaterThanOrEqualToStartParameterValue(
+                    attributeLocation,
+                    end,
+                    start));
+
+            return null;
+        }
+
+        if (methodSymbol.ReturnType is not INamedTypeSymbol returnTypeSymbol ||
+            !SymbolEqualityComparer.Default.Equals(enumerableOfStringSymbol, returnTypeSymbol))
+        {
+            context.ReportDiagnostic(
+                Diagnostics.ReturnTypeOfMethodMustBeIEnumerableOfString(
+                    methodLocation));
+
+            return null;
+        }
+
         var result = new GenerationInfo(
-            syntaxNode,
+            methodSyntax,
             methodSymbol,
-            (int)ctorArgs[0].Value!,
-            (int)ctorArgs[1].Value!);
-
-        // TODO: warning
-        if (methodSymbol.ReturnType is not INamedTypeSymbol returnTypeSymbol)
-        {
-            return null;
-        }
-
-        // TODO: warning
-        if (!SymbolEqualityComparer.Default.Equals(enumerableOfStringSymbol, returnTypeSymbol))
-        {
-            return null;
-        }
+            start,
+            end);
 
         return result;
     }
 
     static SyntaxNode GenerateSyntax(
-        GenerationInfo info)
+        GenerationInfo info,
+        SourceProductionContext context)
     {
         var yieldStatements = new List<YieldStatementSyntax>(info.End - info.Start + 1);
 
         for (var i = info.Start; i <= info.End; ++i)
         {
+            context.CancellationToken.ThrowIfCancellationRequested();
+
             var output = ConvertToNabeatsu(i);
 
             var yieldStatement = SyntaxFactory
@@ -169,6 +215,8 @@ public class Generator :
         sourceTypeNode = sourceTypeNode.Parent as TypeDeclarationSyntax;
         while (sourceTypeNode is not null)
         {
+            context.CancellationToken.ThrowIfCancellationRequested();
+
             var parentTypeDecl = SyntaxFactory
                 .TypeDeclaration(sourceTypeNode.Kind(), sourceTypeNode.Identifier)
                 .WithModifiers(sourceTypeNode.Modifiers)
@@ -187,6 +235,8 @@ public class Generator :
         var sourceNsNode = (BaseNamespaceDeclarationSyntax?)topSourceTypeNode.Parent;
         while (sourceNsNode is not null)
         {
+            context.CancellationToken.ThrowIfCancellationRequested();
+
             nsNames.Push(sourceNsNode.Name.ToString());
             sourceNsNode = sourceNsNode.Parent as BaseNamespaceDeclarationSyntax;
         }
