@@ -1,13 +1,24 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <LangVersion>10</LangVersion>
-    <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
-    <EnableNETAnalyzers>True</EnableNETAnalyzers>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <AnalysisLevel>6.0-all</AnalysisLevel>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <DebugType>embedded</DebugType>
   </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="JapaneseFormatter.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AssemblyAttribute Include="System.CLSCompliantAttribute">
+      <_Parameter1>true</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
 
 </Project>

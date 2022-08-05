@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "NabeatsuGenerator.SourceGenerator": {
+      "commandName": "DebugRoslynComponent",
+      "targetProject": "..\\NabeatsuConsole\\NabeatsuConsole.csproj"
+    }
+  }
+}

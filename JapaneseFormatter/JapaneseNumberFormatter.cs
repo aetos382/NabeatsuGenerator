@@ -1,5 +1,4 @@
-﻿using System.Numerics;
-using System.Text;
+﻿using System.Text;
 
 namespace JapaneseFormatter;
 
@@ -28,39 +27,28 @@ public class JapaneseNumberFormatter :
             return string.Empty;
         }
 
-        if (format != Formats.Hiragana &&
-            format != Formats.Katakana &&
-            format != Formats.Kanji)
+        var conversionTable = format switch {
+            Formats.Hiragana => ConversionTable.Hiragana,
+            _ => throw new FormatException()
+        };
+
+        if (arg is not int value)
         {
-            throw new FormatException();
+            throw new NotSupportedException();
         }
 
-        if (arg is byte ||
-            arg is sbyte ||
-            arg is short ||
-            arg is ushort ||
-            arg is int ||
-            arg is uint ||
-            arg is long ||
-            arg is ulong ||
-            arg is BigInteger)
-        {
-        }
-
-        if (arg is IFormattable formattable)
-        {
-            return formattable.ToString(format, formatProvider);
-        }
-
-        return arg.ToString();
+        return ToJapaneseString(value, conversionTable);
     }
 
-    static string ToJapaneseString(
-        int value)
+    private static string ToJapaneseString(
+        int value,
+        IConversionTable table)
     {
-        if (value == 0)
+        var result = table.SpecialFormat(value);
+
+        if (result is not null)
         {
-            return "ぜろ";
+            return result;
         }
 
         var builder = new StringBuilder();
@@ -75,45 +63,16 @@ public class JapaneseNumberFormatter :
 
         var length = digits.Count;
 
-        var manUnit = length switch {
-            10 or 9 => 2,
-            8 or 7 or 6 or 5 => 1,
-            4 or 3 or 2 or 1 => 0
-        };
-
-        var juUnit = length switch {
-            8 or 4 => 3,
-            7 or 3 => 2,
-            10 or 6 or 2 => 1,
-            9 or 5 or 1 => 0
-        };
+        var manUnit = (length - 1) / 4;
+        var juUnit = (length - 1 ) % 4;
 
         while (digits.Any())
         {
             var digit = digits.Pop();
 
-            var digitString = (digit, juUnit) switch {
-                (0, _) => string.Empty,
-                (6, 2) => "ろっ",
-                (8, 2) => "はっ",
-                (1, 3) => "いっ",
-                (8, 3) => "はっ",
-                _ => Digits[digit - 1]
-            };
-
-            var manUnitString = (manUnit, juUnit) switch {
-                (> 0, 0) => ManUnits[manUnit - 1],
-                _ => string.Empty
-            };
-
-            var juUnitString = (digit, juUnit) switch {
-                (_, 0) => string.Empty,
-                (3, 2) => "びゃく",
-                (6, 2) => "ぴゃく",
-                (8, 2) => "ぴゃく",
-                (3, 3) => "ぜん",
-                _ => JuUnits[juUnit - 1]
-            };
+            var digitString = table.GetDigit(digit, juUnit, manUnit);
+            var juUnitString = table.GetJuUnit(digit, juUnit, manUnit);
+            var manUnitString = table.GetManUnit(digit, juUnit, manUnit);
 
             builder.Append($"{digitString}{juUnitString}{manUnitString}");
 
@@ -131,5 +90,5 @@ public class JapaneseNumberFormatter :
         return builder.ToString();
     }
 
-    public static readonly JapaneseNumberFormatter Instance = new();
+    public static readonly JapaneseNumberFormatter Default = new();
 }

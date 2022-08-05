@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System.Diagnostics;
+using System.Globalization;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -49,10 +50,20 @@ public class Generator :
             generationInfoProvider,
             static (context, source) => {
 
+                Debug.Assert(source is not null);
+
                 var generatedSyntax = GenerateSyntax(source);
+
                 var code = generatedSyntax.NormalizeWhitespace().ToFullString();
 
-                context.AddSource("foo.cs", code);
+                var format = new SymbolDisplayFormat(
+                    typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces,
+                    parameterOptions: SymbolDisplayParameterOptions.IncludeType);
+
+                var typeName = source.MethodSymbol.ContainingType.ToDisplayString(format);
+                var methodName = source.MethodSymbol.ToDisplayString(format);
+
+                context.AddSource($"{typeName}.{methodName}.cs", code);
 
             });
     }
@@ -97,12 +108,11 @@ public class Generator :
         var ctorArgs = nAttr.ConstructorArguments;
 
         // TODO: warning
-        var result = new GenerationInfo {
-            Node = syntaxNode,
-            Method = methodSymbol,
-            Start = (int)ctorArgs[0].Value!,
-            End = (int)ctorArgs[1].Value!
-        };
+        var result = new GenerationInfo(
+            syntaxNode,
+            methodSymbol,
+            (int)ctorArgs[0].Value!,
+            (int)ctorArgs[1].Value!);
 
         // TODO: warning
         if (methodSymbol.ReturnType is not INamedTypeSymbol returnTypeSymbol)
@@ -138,7 +148,7 @@ public class Generator :
             yieldStatements.Add(yieldStatement);
         }
 
-        var sourceMethodNode = info.Node;
+        var sourceMethodNode = info.MethodNode;
 
         var method = SyntaxFactory
             .MethodDeclaration(sourceMethodNode.ReturnType, sourceMethodNode.Identifier)
@@ -205,7 +215,7 @@ public class Generator :
 
         if (value % 3 == 0 || standardString.Contains("3"))
         {
-            return string.Format(JapaneseNumberFormatter.Instance, "{0:H}", value);
+            return string.Format(JapaneseNumberFormatter.Default, "{0:H}", value);
         }
 
         return standardString;

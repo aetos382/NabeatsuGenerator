@@ -10,7 +10,7 @@ trim_trailing_whitespace = true
 charset = utf-8-bom
 indent_size = 4
 
-[*.{xml,*proj,targets,props}]
+[*.{xml,*proj,targets,props,config}]
 indent_size = 2
 
 [*.cs]

@@ -3,7 +3,6 @@ bin/
 obj/
 
 *.user
-launchSettings.json
 
 *.log
 *.binlog

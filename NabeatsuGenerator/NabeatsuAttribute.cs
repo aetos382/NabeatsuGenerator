@@ -8,8 +8,8 @@ public sealed class NabeatsuAttribute :
     Attribute
 {
     public NabeatsuAttribute(
-        int start = 1,
-        int end = 100)
+        int start,
+        int end)
     {
         if (start < 0)
         {

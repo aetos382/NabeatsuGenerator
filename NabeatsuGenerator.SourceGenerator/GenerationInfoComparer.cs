@@ -3,7 +3,7 @@
 namespace NabeatsuGenerator.SourceGenerator;
 
 internal sealed class GenerationInfoComparer :
-    IEqualityComparer<GenerationInfo>
+    IEqualityComparer<GenerationInfo?>
 {
     public bool Equals(
         GenerationInfo? x,
@@ -14,33 +14,18 @@ internal sealed class GenerationInfoComparer :
             return true;
         }
 
-        if (x is null)
+        if (x is null || y is null)
         {
             return false;
         }
 
-        if (y is null)
-        {
-            return false;
-        }
-
-        return
-            x.Node.IsEquivalentTo(y.Node) &&
-            SymbolEqualityComparer.Default.Equals(x.Method, y.Method) &&
-            x.Start == y.Start &&
-            x.End == y.End;
+        return x.Equals(y);
     }
 
-    public int GetHashCode(GenerationInfo obj)
+    public int GetHashCode(
+        GenerationInfo? obj)
     {
-        unchecked
-        {
-            var hashCode = obj.Node.GetHashCode();
-            hashCode = (hashCode * 397) ^ SymbolEqualityComparer.Default.GetHashCode(obj.Method);
-            hashCode = (hashCode * 397) ^ obj.Start;
-            hashCode = (hashCode * 397) ^ obj.End;
-            return hashCode;
-        }
+        return obj?.GetHashCode() ?? 0;
     }
 
     public static GenerationInfoComparer Instance = new();

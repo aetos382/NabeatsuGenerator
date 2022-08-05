@@ -8,11 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\NabeatsuGenerator\NabeatsuGenerator.csproj"/>
+    <ProjectReference Include="..\NabeatsuGenerator\NabeatsuGenerator.csproj" />
     <ProjectReference Include="..\NabeatsuGenerator.SourceGenerator\NabeatsuGenerator.SourceGenerator.csproj">
       <PrivateAssets>all</PrivateAssets>
       <OutputItemType>Analyzer</OutputItemType>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
   </ItemGroup>
 
