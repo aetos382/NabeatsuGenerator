@@ -96,13 +96,13 @@ internal static class SyntaxNodeExtensions
 
                 var expression = ValueToExpression(constructorArgument.Value);
 
-                var argument = constructorArgument.ParameterName switch {
-                    null => SyntaxFactory.AttributeArgument(expression),
-                    var name => SyntaxFactory.AttributeArgument(
-                        default,
-                        SyntaxFactory.NameColon(name),
-                        expression)
+                var nameSyntax = constructorArgument.ParameterName switch {
+                    null => default,
+                    var name => SyntaxFactory.NameColon(name)
                 };
+
+                var argument = SyntaxFactory.AttributeArgument(
+                    default, nameSyntax, expression);
 
                 attributeArguments.Add(argument);
             }
@@ -116,13 +116,15 @@ internal static class SyntaxNodeExtensions
 
                 var expression = ValueToExpression(namedArgument.Value);
 
-                var argument = namedArgument.MemberName switch {
-                    null => SyntaxFactory.AttributeArgument(expression),
-                    var name => SyntaxFactory.AttributeArgument(
-                        SyntaxFactory.NameEquals(name),
-                        default,
-                        expression)
+                var nameSyntax = namedArgument.MemberName switch {
+                    null => default,
+                    var name => SyntaxFactory.NameEquals(name)
                 };
+
+                var argument = SyntaxFactory.AttributeArgument(
+                    nameSyntax,
+                    default,
+                    expression);
 
                 attributeArguments.Add(argument);
             }
