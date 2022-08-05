@@ -151,8 +151,8 @@ public static partial class SyntaxNodeExtensions
 
         if (value is Type t)
         {
-            var typeName = SyntaxFactory.ParseTypeName(t.FullName!) as NameSyntax;
-            expression = SyntaxFactory.TypeOfExpression(typeName!.WithGlobalPrefix());
+            var typeName = SyntaxFactory.ParseName(t.FullName!);
+            expression = SyntaxFactory.TypeOfExpression(typeName.WithGlobalPrefix());
         }
         else if (value is Enum e)
         {
