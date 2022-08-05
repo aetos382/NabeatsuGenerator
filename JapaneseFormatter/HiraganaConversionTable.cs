@@ -25,7 +25,7 @@ internal class HiraganaConversionTable :
     {
         return (digit, juUnit, manUnit) switch {
             (0, _, _) => string.Empty,
-            (1, _, 0) => string.Empty,
+            (1, not 0, 0) => string.Empty,
             (6, 2, _) => "ろっ",
             (8, 2, _) => "はっ",
             (1, 3, 1 or 2) => "いっ",

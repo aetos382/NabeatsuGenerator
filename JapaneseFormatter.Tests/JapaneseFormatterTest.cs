@@ -6,6 +6,12 @@ public class JapaneseFormatterTest
 {
     [Theory]
     [InlineData(0, "ぜろ")]
+    [InlineData(1, "いち")]
+    [InlineData(10, "じゅう")]
+    [InlineData(11, "じゅういち")]
+    [InlineData(31, "さんじゅういち")]
+    [InlineData(100, "ひゃく")]
+    [InlineData(1000, "せん")]
     [InlineData(10002, "いちまんに")]
     [InlineData(10000002, "いっせんまんに")]
     [InlineData(2147483647, "にじゅういちおくよんせんななひゃくよんじゅうはちまんさんぜんろっぴゃくよんじゅうなな")]
